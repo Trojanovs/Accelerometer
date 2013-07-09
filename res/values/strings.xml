@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Accelerometer</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="ipAddressLabel">Server IP Address:</string>
+    <string name="startSendButton">Start streaming</string>
+    <string name="customMessageLabel">Custom message:</string>
+    <string name="customMessageText">Message here</string>
+    <string name="sendCustomMessageButtonText">Send custom message</string>
+    <string name="stopSendButton">Stop streaming</string>
+    <string name="serverPortLabel">Port:</string>
+
+</resources>
