@@ -11,5 +11,6 @@
     <string name="sendCustomMessageButtonText">Send custom message</string>
     <string name="stopSendButton">Stop streaming</string>
     <string name="serverPortLabel">Port:</string>
+    <string name="periodLabel">Period:</string>
 
 </resources>
