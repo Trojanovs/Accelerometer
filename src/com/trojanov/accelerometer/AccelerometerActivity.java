@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.util.Date;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,10 +37,11 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	EditText ipAddressText;
 	EditText serverPortText;
 	EditText customMessageText;
-	
+	Socket socket = null;
 	String serverIPAddress = null;
 	String serverPort = null;
 	String customMessage = null;
+	Date timestamp = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +50,6 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		
 		startStreaminButton = (Button)findViewById(R.id.startStreamingButton);
 		sendCustomMessageButton = (Button)findViewById(R.id.sendCustomMessageButton);
-		
-		
 		
 		ipAddressText = (EditText)findViewById(R.id.ipAddressText);
 		serverPortText = (EditText)findViewById(R.id.serverPortText);
@@ -112,6 +114,11 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	private void startStreaming() {
 		if(streaming){
 			streaming = false;
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			startStreaminButton.setText(R.string.startSendButton);
 			sensorManager.unregisterListener(this);
 		}			
@@ -148,7 +155,6 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 				
 				@Override
 				public void run() {
-					Socket socket;
 					try {
 						socket = new Socket(serverIPAddress, Integer.valueOf(serverPort));			
 						//Send the message to the server
@@ -157,15 +163,13 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 			            BufferedWriter bw = new BufferedWriter(osw);
 			            
 			            bw.write(message);
-			            bw.flush();		
-			            socket.close();
+			            bw.flush();					            
 						
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
 						e.printStackTrace();
-					} 
-					
+					} 					
 				}
 			});
 			thread.start();	
