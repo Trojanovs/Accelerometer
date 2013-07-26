@@ -6,13 +6,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-<<<<<<< HEAD
 import java.util.Timer;
 import java.util.TimerTask;
-=======
 import java.sql.Timestamp;
 import java.util.Date;
->>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -42,10 +39,10 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	EditText ipAddressText;
 	EditText serverPortText;
 	EditText customMessageText;
-<<<<<<< HEAD
 	EditText endOfMessageText;
 	EditText periodText;
 	
+	Socket socket = null;
 	String serverIPAddress = null;
 	String serverPort = null;
 	String customMessage = null;
@@ -55,15 +52,8 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	String message = null;
 	
 	Timer timer = null;
-	
-	Long period = null;
-=======
-	Socket socket = null;
-	String serverIPAddress = null;
-	String serverPort = null;
-	String customMessage = null;
 	Date timestamp = null;
->>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
+	Long period = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -195,15 +185,8 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 			            OutputStreamWriter osw = new OutputStreamWriter(os);
 			            BufferedWriter bw = new BufferedWriter(osw);
 			            
-<<<<<<< HEAD
 			            bw.write(message+endOfMessage);
-			            bw.flush();		
-			            socket.close();
-=======
-			            bw.write(message);
 			            bw.flush();					            
->>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
-						
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
