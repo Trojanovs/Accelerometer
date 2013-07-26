@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,10 +37,20 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	EditText ipAddressText;
 	EditText serverPortText;
 	EditText customMessageText;
+	EditText endOfMessageText;
+	EditText periodText;
 	
 	String serverIPAddress = null;
 	String serverPort = null;
 	String customMessage = null;
+	String endOfMessage = null;
+	String perioString = null;
+	
+	String message = null;
+	
+	Timer timer = null;
+	
+	Long period = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +65,9 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		ipAddressText = (EditText)findViewById(R.id.ipAddressText);
 		serverPortText = (EditText)findViewById(R.id.serverPortText);
 		customMessageText = (EditText)findViewById(R.id.customMessageText);	
-			
+		endOfMessageText = (EditText)findViewById(R.id.endOfMessageText);
+		periodText = (EditText)findViewById(R.id.periodText);
+		
 		getSettings();						
 				
 		startStreaminButton.setOnClickListener(new OnClickListener() {			
@@ -87,48 +102,56 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		TextView tvX= (TextView)findViewById(R.id.x_axis);
 		TextView tvY= (TextView)findViewById(R.id.y_axis);
 		TextView tvZ= (TextView)findViewById(R.id.z_axis);
-		
+        
+        tvX.setText(String.format("%.3f", ax));
+        tvY.setText(String.format("%.3f", ay));
+        tvZ.setText(String.format("%.3f", az)); 
+        
         if (event.sensor.getType()==Sensor.TYPE_LINEAR_ACCELERATION){
             ax=event.values[0];
             ay=event.values[1];
             az=event.values[2];    
         }
-//        if (event.sensor.getType()==Sensor.TYPE_GRAVITY){
-//            ax=ax-event.values[0];
-//            ay=ay-event.values[1];
-//            az=az-event.values[2];
-//         
-//        }        
-        tvX.setText(String.format("%.3f", ax));
-        tvY.setText(String.format("%.3f", ay));
-        tvZ.setText(String.format("%.3f", az));  
+                 
+        message =String.format("%.3f", ax)+" "+String.format("%.3f", ay)+" "+String.format("%.3f", az);
         
-        String message =String.format("%.3f", ax)+" "+String.format("%.3f", ay)+" "+String.format("%.3f", az);
-        sendMessage(message);
+        //sendMessage(message);
 	}
 	
-
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	private void startStreaming() {
 		if(streaming){
 			streaming = false;
 			startStreaminButton.setText(R.string.startSendButton);
 			sensorManager.unregisterListener(this);
+			timer.cancel();
+			timer = null;
 		}			
 		else {				
 			streaming = true;
 			
 			serverIPAddress = ipAddressText.getText().toString();
 			serverPort = serverPortText.getText().toString();
+			endOfMessage =endOfMessageText.getText().toString();
+			period = Long.valueOf(periodText.getText().toString());
 			
 			setSettings();
 			
 			startStreaminButton.setText(R.string.stopSendButton);
 			sensorManager=(SensorManager) getSystemService(SENSOR_SERVICE);
-	        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_GAME);
-	        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_GAME);
+	        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
+	        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_FASTEST);
+	        timer = new Timer();
+	        timer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					sendMessage(message);
+				}
+			}, 1000, period);
 		}						     
 	}
+	
 	
 	private void sendCustomMessage() {
 						
@@ -142,7 +165,8 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		
 	}
 		
-	private void sendMessage(final String message) {		
+	private void sendMessage(final String message) {	
+		
 		if(serverIPAddress.length()>0 && serverPort.length()>0 && message.length()>0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -156,7 +180,7 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 			            OutputStreamWriter osw = new OutputStreamWriter(os);
 			            BufferedWriter bw = new BufferedWriter(osw);
 			            
-			            bw.write(message);
+			            bw.write(message+endOfMessage);
 			            bw.flush();		
 			            socket.close();
 						
@@ -176,6 +200,8 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		  SharedPreferences settings = getSharedPreferences("server", 0);		  
 		  ipAddressText.setText(settings.getString("ip", "").toString());
 		  serverPortText.setText(settings.getString("port", "").toString());
+		  endOfMessageText.setText(settings.getString("endMessage", "").toString());
+		  periodText.setText(settings.getString("period", "").toString());
 	  }
 
 	  public void setSettings() {
@@ -183,6 +209,8 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		  SharedPreferences.Editor editor = settings.edit();
 		  editor.putString("ip",serverIPAddress);
 		  editor.putString("port",serverPort);
+		  editor.putString("endMessage",endOfMessage);
+		  editor.putString("period",period.toString());
 		  editor.commit();
 	  }
 }
