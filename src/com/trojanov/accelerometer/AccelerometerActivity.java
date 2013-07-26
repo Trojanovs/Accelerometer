@@ -6,8 +6,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+<<<<<<< HEAD
 import java.util.Timer;
 import java.util.TimerTask;
+=======
+import java.sql.Timestamp;
+import java.util.Date;
+>>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -37,6 +42,7 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	EditText ipAddressText;
 	EditText serverPortText;
 	EditText customMessageText;
+<<<<<<< HEAD
 	EditText endOfMessageText;
 	EditText periodText;
 	
@@ -51,6 +57,13 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	Timer timer = null;
 	
 	Long period = null;
+=======
+	Socket socket = null;
+	String serverIPAddress = null;
+	String serverPort = null;
+	String customMessage = null;
+	Date timestamp = null;
+>>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +72,6 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 		
 		startStreaminButton = (Button)findViewById(R.id.startStreamingButton);
 		sendCustomMessageButton = (Button)findViewById(R.id.sendCustomMessageButton);
-		
-		
 		
 		ipAddressText = (EditText)findViewById(R.id.ipAddressText);
 		serverPortText = (EditText)findViewById(R.id.serverPortText);
@@ -122,6 +133,11 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 	private void startStreaming() {
 		if(streaming){
 			streaming = false;
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			startStreaminButton.setText(R.string.startSendButton);
 			sensorManager.unregisterListener(this);
 			timer.cancel();
@@ -172,7 +188,6 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 				
 				@Override
 				public void run() {
-					Socket socket;
 					try {
 						socket = new Socket(serverIPAddress, Integer.valueOf(serverPort));			
 						//Send the message to the server
@@ -180,16 +195,20 @@ public class AccelerometerActivity extends Activity implements SensorEventListen
 			            OutputStreamWriter osw = new OutputStreamWriter(os);
 			            BufferedWriter bw = new BufferedWriter(osw);
 			            
+<<<<<<< HEAD
 			            bw.write(message+endOfMessage);
 			            bw.flush();		
 			            socket.close();
+=======
+			            bw.write(message);
+			            bw.flush();					            
+>>>>>>> f340e8ee05a9d9b39fdba0e3a5b705fa63448be3
 						
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
 						e.printStackTrace();
-					} 
-					
+					} 					
 				}
 			});
 			thread.start();	
