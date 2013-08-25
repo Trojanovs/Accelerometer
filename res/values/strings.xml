@@ -12,5 +12,7 @@
     <string name="stopSendButton">Stop streaming</string>
     <string name="serverPortLabel">Port:</string>
     <string name="periodLabel">Period:</string>
+    <string name="startRecordButton">Start recording</string>
+    <string name="stopRecordButton">Stop recording</string>
 
 </resources>
